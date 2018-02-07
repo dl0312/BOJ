@@ -1,260 +1,238 @@
+
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Scanner;
 
-//	BOJ - 13460
+//	BOJ - 14948
 //	Algorithm - ?
+//	2017 Sogang Programming Contest - Champion F¹ø
+
+/*
+ 11122
+2>3>12>1>3>2
+0>0>0>1>0>0
+43
+
+4 3
+2 5 2
+3 4 3
+12 1 3
+1 3 2
+ */
 
 public class Main {
 	private static int n,m;
-	private static Pos O;
-	private static char [][] map;
-	private static boolean [][] visit_b;
-	private static boolean [][] visit_r;
-	private static Queue<t_Pos> q = new LinkedList<>();
 	
-	private static class Pos{
-		int x,y;
-		public Pos(int x,int y) {
-			this.x = x;
-			this.y = y;
-		}
+	public static int[] update(int [] the_list, int n, int [] result) {
+		int []templist = new int [the_list.length-n];
+		System.arraycopy(the_list, n, templist, 0, the_list.length-n);
+		Arrays.sort(templist);
+		System.arraycopy(templist, 0, the_list, n, templist.length);
+		System.arraycopy(the_list, 0, result, 0, the_list.length);
+		return the_list;
 	}
 	
-	private static class t_Pos{
-		Pos B;
-		Pos R;
-		int cnt;
-		public t_Pos(Pos B, Pos R, int cnt) {
-			this.B = B;
-			this.R = R;
-			this.cnt = cnt;
-		}
+	public static int factorial(int n) {
+		if (n <= 1)
+			return n;
+		else 
+			return factorial(n-1) * n;
 	}
 	
-	public static int BFS(t_Pos now) {
-		t_Pos tmp = now;
-		q.offer(now);
-		boolean b_flag = false;
-		boolean r_flag = false;
-		int min_cnt = 11;
-		while(!q.isEmpty()) {
-			b_flag = false;
-			r_flag = false;
-			now = q.poll();
-			visit_b[now.B.x][now.B.y] = true;
-			visit_r[now.R.x][now.R.y] = true;
-			if(now.cnt>=11) {
-				System.out.println(-1);
-				min_cnt = -1;
-				break;
-			}
-			print_map(now);
-			for(int i=0;i<4;i++) {	// 0:µ¿,1:¼­,2:³²,3:ºÏ
-				tmp = new t_Pos(roll(now.B,i),roll(now.R,i),now.cnt+1);
-				if(i==0) {
-					if(tmp.B.y==tmp.R.y && tmp.B.x==tmp.R.x) {
-						if(now.B.y>now.R.y) {
-							tmp.R.y--;
-						}
-						else {
-							tmp.B.y--;
-						}
-					}
-					if((tmp.B!=now.B || tmp.R!=now.R) && (visit_b[tmp.B.x][tmp.B.y]==false||visit_r[tmp.R.x][tmp.R.y]==false))  {
-						if((now.B.y<O.y && tmp.B.y>=O.y) && now.B.x == O.x) {
-							b_flag = true;
-						}
-						if((now.R.y<O.y && tmp.R.y>=O.y) && now.R.x == O.x) {
-							r_flag = true;
-						}
-						if(b_flag == false && r_flag == false) {
-							q.offer(tmp);
-						}
-						else if(r_flag == true && b_flag == false ) {
-//							System.out.println(tmp.cnt);
-							if(min_cnt>tmp.cnt) min_cnt = tmp.cnt;
-							break;
-						}
-					}
-				}
-				else if(i==1) {
-					if(tmp.B.y==tmp.R.y && tmp.B.x==tmp.R.x) {
-						if(now.B.y<now.R.y) {
-							tmp.R.y++;
-						}
-						else {
-							tmp.B.y++;
-						}
-					}
-					if((tmp.B!=now.B || tmp.R!=now.R) && (visit_b[tmp.B.x][tmp.B.y]==false||visit_r[tmp.R.x][tmp.R.y]==false)) {
-						if((now.B.y>O.y && tmp.B.y<=O.y) && now.B.x == O.x) {
-							b_flag = true;
-						}
-						if((now.R.y>O.y && tmp.R.y<=O.y) && now.R.x == O.x) {
-							r_flag = true;
-						}
-						if(b_flag == false && r_flag == false) {
-							q.offer(tmp);
-						}
-						else if(r_flag == true && b_flag == false ) {
-//							System.out.println(tmp.cnt);
-							if(min_cnt>tmp.cnt) min_cnt = tmp.cnt;
-							break;
-						}
-					}
-				}
-				else if(i==2) {
-					if(tmp.B.y==tmp.R.y && tmp.B.x==tmp.R.x) {
-						if(now.B.x>now.R.x) {
-							tmp.R.x--;
-						}
-						else {
-							tmp.B.x--;
-						}
-					}
-					if((tmp.B!=now.B || tmp.R!=now.R) && (visit_b[tmp.B.x][tmp.B.y]==false||visit_r[tmp.R.x][tmp.R.y]==false)) {
-						if((now.B.x<O.x && tmp.B.x>=O.x) && now.B.y == O.y) {
-							b_flag = true;
-						}
-						if((now.R.x<O.x && tmp.R.x>=O.x) && now.R.y == O.y) {
-							r_flag = true;
-						}
-						if(b_flag == false && r_flag == false) {
-							q.offer(tmp);
-						}
-						else if(r_flag == true && b_flag == false ) {
-//							System.out.println(tmp.cnt);
-							if(min_cnt>tmp.cnt) min_cnt = tmp.cnt;
-							break;
-						}
-					}		
-				}
-				else if(i==3) {
-					if(tmp.B.y==tmp.R.y && tmp.B.x==tmp.R.x) {
-						if(now.B.x<now.R.x) {
-							tmp.R.x++;
-						}
-						else {
-							tmp.B.x++;
-						}
-					}
-					if((tmp.B!=now.B || tmp.R!=now.R) && (visit_b[tmp.B.x][tmp.B.y]==false||visit_r[tmp.R.x][tmp.R.y]==false)) {
-						if((now.B.x>O.x && tmp.B.x<=O.x) && now.B.y == O.y) {
-							b_flag = true;
-						}
-						if((now.R.y>O.x && tmp.R.x<=O.x) && now.R.y == O.y) {
-							r_flag = true;
-						}
-						if(b_flag == false && r_flag == false) {
-							q.offer(tmp);
-						}
-						else if(r_flag == true && b_flag == false ) {
-//							System.out.println(tmp.cnt);
-							if(min_cnt>tmp.cnt) min_cnt = tmp.cnt;
-							break;
-						}
-					}
-				}
-			}
+	public static int [][] permute(int [] source){
+		int [] reverse_source = new int [source.length];
+		for(int i=0;i<source.length;i++) {
+			reverse_source[source.length-i-1] = source[i];
 		}
-		if(min_cnt==11) {
-			return -1;
-		}
-		else return min_cnt;
-	}
-	
-	public static Pos roll(Pos p, int dir) {
-		// dir 0:µ¿,1:¼­,2:³²,3:ºÏ
-		Pos tmp = new Pos(p.x,p.y);
-		if(dir==0) {
-			while(true) {
-				tmp.y++;
-				if(map[tmp.x][tmp.y]=='#') {
-					tmp.y--;
+		int [][] permute_ary = new int [permute_num(n-1,m-1)][n+m-2];
+		int [] result = new int [source.length];
+		int cnt =0;
+		System.arraycopy(source, 0, result, 0, source.length);
+		while( !Arrays.equals(source, reverse_source) && cnt < factorial(source.length)) {
+			System.arraycopy(source, 0, permute_ary[cnt], 0, source.length);
+			cnt++;
+			for(int i=source.length-1;i>0;i--) {
+				if(source[i]>source[i-1]) {
+					for(int j=i;j<source.length;j++) {
+						if(source[i-1]>=source[j]) {
+							int tmp = source[i-1];
+							source[i-1] = source[j-1];
+							source[j-1] = tmp;
+							source = update(source,i,result);
+							break;
+						}
+						else if(j==source.length-1) {
+							if(source[i-1]!=source[j]) {
+								int tmp = source[i-1];
+								source[i-1] = source[j];
+								source[j] = tmp;
+								source = update(source,i,result);
+								break;
+							}
+							else {
+								for(int k=j;k>0;k--) {
+									if(source[i-1]!=source[k]) {
+										int tmp = source[i-1];
+										source[i-1] = source[k];
+										source[k] = tmp;
+										source = update(source,i,result);
+										break;
+									}
+								}
+							}
+						}
+					}
 					break;
 				}
 			}
 		}
-		else if(dir==1) {
-			while(true) {
-				tmp.y--;
-				if(map[tmp.x][tmp.y]=='#') {
-					tmp.y++;
-					break;
-				}
-			}
-		}
-		else if(dir==2) {
-			while(true) {
-				tmp.x++;
-				if(map[tmp.x][tmp.y]=='#') {
-					tmp.x--;
-					break;
-				}
-			}
-		}
-		else if(dir==3) {
-			while(true) {
-				tmp.x--;
-				if(map[tmp.x][tmp.y]=='#') {
-					tmp.x++;
-					break;
-				}
-			}
-		}
-		return tmp;
+		System.arraycopy(source, 0, permute_ary[cnt], 0, source.length);
+		cnt++;
+		return permute_ary;
 	}
 	
-	public static void print_map(t_Pos pos) {
-		for(int i=0;i<n;i++) {
-			for(int j=0;j<m;j++) {
-				if(pos.B.x==i && pos.B.y==j) {
-					System.out.print('B' + " ");
-				}
-				else if(pos.R.x==i && pos.R.y==j) {
-					System.out.print('R' + " ");
-				}
-				else {
-					System.out.print(map[i][j] + " ");
+	public static int permute_num(int n,int m) {
+		return (factorial(n+m)/(factorial(n)*factorial(m)));
+	}
+	
+	private static class Path{
+		int [] path;
+		boolean [] curve;
+		int max_pivot;
+		int max_lv=0;
+		
+		public Path(int [] path) {
+			this.path = path;
+		}
+		public Path() {
+			this.path = new int [n+m-1];
+			this.curve = new boolean [n+m-1];
+			for(int i=0;i<n+m-1;i++) {
+				this.path[i] = 0;
+				this.curve[i] = false;
+			}
+		}
+		public int max_lv() {
+			for(int i=0;i<n+m-1;i++) {
+				if(i!=max_pivot) {
+					if(max_lv<this.path[i]) {
+						max_lv=this.path[i];
+					}
 				}
 			}
-			System.out.println();
+			return this.max_lv;
 		}
-		System.out.println("cnt: " + pos.cnt);
-		System.out.println();
+		
+		public void print() {
+			this.max_lv();
+			System.out.println(Arrays.toString(this.path));
+			System.out.println(Arrays.toString(this.curve));
+			System.out.println("max_pivot: " + this.max_pivot);
+			System.out.println("max_lv: " + this.max_lv);
+		}
+	}
+	
+	private static class Map{
+		int [][] map;
+		public Map(Scanner scn) {
+			this.map = new int [n][m];
+			for(int i=0;i<n;i++) {
+				for(int j=0;j<m;j++) {
+					this.map[i][j] = scn.nextInt();
+				}
+			}
+		}
+		
+		public void print() {
+			for(int i=0;i<n;i++) {
+				System.out.println(map[i]);
+			}
+		}
+		
+		public Path path(int [] permute_ary) {
+			Path path = new Path();
+			int pivot=0;
+			int x_pivot=0;
+			int y_pivot=0;
+			int max_num=0;
+			path.path[pivot] = map[x_pivot][y_pivot];
+			pivot++;
+			if(permute_ary[0]==1) {
+				x_pivot++;
+				path.path[pivot] = this.map[x_pivot][y_pivot];
+			}
+			else if(permute_ary[0]==2) {
+				y_pivot++;
+				path.path[pivot] = this.map[x_pivot][y_pivot];
+			}
+			pivot++;
+			for(int i=1;i<n+m-3;i++) {
+				if(permute_ary[i]!=permute_ary[i+1]) {
+					path.curve[i+1] = true;
+				}
+				if(permute_ary[i]==1) {
+					x_pivot++;
+					path.path[pivot] = this.map[x_pivot][y_pivot];
+					if(max_num<path.path[pivot] && path.curve[i]==false) {
+						max_num = path.path[pivot];
+						path.max_pivot = pivot;
+					}
+				}
+				else if(permute_ary[i]==2) {
+					y_pivot++;
+					path.path[pivot] = this.map[x_pivot][y_pivot];
+					if(max_num<path.path[pivot] && path.curve[i]==false) {
+						max_num = path.path[pivot];
+						path.max_pivot = pivot;
+					}
+				}
+				pivot++;
+			}
+			if(permute_ary[n+m-3]==1) {
+				x_pivot++;
+				path.path[pivot] = this.map[x_pivot][y_pivot];
+			}
+			else if(permute_ary[n+m-3]==2) {
+				y_pivot++;
+				path.path[pivot] = this.map[x_pivot][y_pivot];
+			}
+			pivot++;
+			
+			return path;
+		}
+		/*
+		public int exit(int [][] permute_ary) {
+			Path path = new Path();
+			int pivot = 0;
+			path.path[0] = this.map[0][0];
+			
+		}
+		*/
 	}
 	
 	public static void main(String[] args) {
 		Scanner scn = new Scanner(System.in);
 		n = scn.nextInt();
 		m = scn.nextInt();
-		Pos B = new Pos(0,0);
-		Pos R = new Pos(0,0);
-		map = new char [n][m];
-		visit_b = new boolean [n][m];
-		visit_r = new boolean [n][m];
-		String trash = scn.nextLine();
-		
-		for(int i=0;i<n;i++) {
-			String str = scn.nextLine();
-			for(int j=0;j<m;j++) {
-				map[i][j] = str.charAt(j);
-				if(str.charAt(j)=='B') {
-					B = new Pos(i,j);
-					map[i][j] = '.';
-				}
-				else if(str.charAt(j)=='R') {
-					R = new Pos(i,j);
-					map[i][j] = '.';
-				}
-				else if(str.charAt(j)=='O') {
-					O = new Pos(i,j);
-				}
+		Map map = new Map(scn);
+		int min_lv=0;
+		int [] ary = new int [n+m-2];
+		int pivot = 0;
+		for(;pivot<n-1;pivot++) {	// down : 1
+			ary[pivot] = 1;
+		}
+		for(;pivot<n+m-2;pivot++) {
+			ary[pivot] = 2;
+		}
+		int [][] permute_ary = permute(ary);
+		for(int i=0;i<permute_num(n-1,m-1);i++) {
+			if(i==0) {
+				min_lv = map.path(permute_ary[i]).max_lv();
+			}
+			if(min_lv > map.path(permute_ary[i]).max_lv()) {
+				min_lv = map.path(permute_ary[i]).max_lv();
 			}
 		}
-		System.out.println(BFS(new t_Pos(B,R,0)));
+		System.out.println(min_lv);
 		scn.close();
 	}
 }
